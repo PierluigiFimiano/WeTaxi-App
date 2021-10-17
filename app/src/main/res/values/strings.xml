@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">TestMessageApp</string>
+    <string name="action_read">Li ho letti</string>
+</resources>
