@@ -9,7 +9,7 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface MessageDao {
 
-    @Query("SELECT * FROM message ORDER BY read DESC, priority")
+    @Query("SELECT * FROM message ORDER BY read ASC, priority DESC")
     fun getAllMessages(): Flow<List<Message>>
 
     @Query("UPDATE message SET read = 1")

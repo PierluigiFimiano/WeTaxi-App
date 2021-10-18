@@ -33,5 +33,9 @@ class DefaultMessageRepository @Inject constructor(
         messageDao.markAllMessagesRead()
     }
 
+    override suspend fun addMassage(message: Message) {
+        messageDao.addMessage(message)
+    }
+
 
 }

@@ -1,5 +1,6 @@
 package it.wetaxi.test.message
 
+import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
@@ -13,10 +14,11 @@ class MessageAdapter : ListAdapter<Message, MessageAdapter.MessageViewHolder>(DI
     class MessageViewHolder private constructor(private val binding: MessageItemViewBinding) :
         RecyclerView.ViewHolder(binding.root) {
 
+        @SuppressLint("SetTextI18n")
         fun bind(message: Message) {
             binding.bodyTextView.text = message.text
-            binding.dateTextView.text = message.date
-            binding.priorityTextView.text = message.priority
+            binding.dateTextView.text = message.date + ", " + message.time
+            binding.priorityTextView.text = "priority " + message.priority
             binding.imageView.setImageResource(
                 if (message.read) {
                     R.drawable.ic_read_24px

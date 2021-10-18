@@ -9,4 +9,6 @@ interface MessageRepository {
     suspend fun getMassage(): Result<Message>
 
     suspend fun markAllMessagesRead()
+
+    suspend fun addMassage(message: Message)
 }

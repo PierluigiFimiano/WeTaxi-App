@@ -5,7 +5,9 @@ import android.view.Menu
 import android.view.MenuItem
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
+import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.messaging.FirebaseMessaging
 import dagger.hilt.android.AndroidEntryPoint
 import it.wetaxi.test.message.databinding.ActivityMainBinding
@@ -52,15 +54,23 @@ class MainActivity : AppCompatActivity() {
         }
 
         viewModel.errorEvent.observeEvent(this) {
-
+            Snackbar.make(
+                binding.rootLayout,
+                "API error",
+                Snackbar.LENGTH_LONG
+            ).show()
         }
 
         viewModel.successEvent.observeEvent(this) {
-
+            Snackbar.make(
+                binding.rootLayout,
+                "API success",
+                Snackbar.LENGTH_LONG
+            ).show()
         }
 
         viewModel.dataLoading.observe(this) {
-
+            binding.content.progressBar.isVisible = it
         }
     }
 
