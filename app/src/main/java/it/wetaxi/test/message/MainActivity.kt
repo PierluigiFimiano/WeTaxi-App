@@ -1,7 +1,6 @@
 package it.wetaxi.test.message
 
-import android.app.NotificationManager
-import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
@@ -12,6 +11,7 @@ import androidx.lifecycle.lifecycleScope
 import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.messaging.FirebaseMessaging
 import dagger.hilt.android.AndroidEntryPoint
+import it.wetaxi.test.message.data.Message
 import it.wetaxi.test.message.databinding.ActivityMainBinding
 import it.wetaxi.test.message.util.collectEvent
 import kotlinx.coroutines.flow.collect
@@ -92,15 +92,34 @@ class MainActivity : AppCompatActivity() {
             viewModel.filterOnlyNotRead(isChecked)
         }
 
-        handleNotifications()
+//        handleNotifications()
+        handleIntent(intent)
     }
 
-    private fun handleNotifications() {
-        val notificationManager: NotificationManager =
-            getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-        notificationManager.activeNotifications.forEach { notification ->
-            val extras = notification.notification.extras
+    // This code doesn't work and I didn't find a way to retrieve all the notifications.
+    // A better solution can be forse the execution of the [onMessageReceived] method
+    // removing the "notification" field or from backend or from mobile side.
+    // The real problem is that a notification should not contain important
+    // data for the application.
 
+//    private fun handleNotifications() {
+//        val notificationManager: NotificationManager =
+//            getSystemService(NOTIFICATION_SERVICE) as NotificationManager
+//        notificationManager.activeNotifications.forEach { notification ->
+//            // ADD it
+//        }
+//    }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        handleIntent(intent)
+    }
+
+    private fun handleIntent(intent: Intent) {
+        if (intent.hasExtra("title")) {
+            val message = Message.from(intent.extras ?: return)
+            intent.removeExtra("title")
+            viewModel.addMessages(message)
         }
     }
 

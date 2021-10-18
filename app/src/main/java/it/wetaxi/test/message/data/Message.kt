@@ -1,5 +1,6 @@
 package it.wetaxi.test.message.data
 
+import android.os.Bundle
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
@@ -25,6 +26,22 @@ data class Message(
                 time = data["time"] ?: "",
                 priority = data["priority"] ?: "",
                 read = data["read"]?.toBooleanStrictOrNull() ?: false
+            )
+        }
+
+        fun from(data: Bundle): Message {
+            return Message(
+                id = if (data.containsKey("id")) {
+                    data.getLong("id")
+                } else {
+                    null
+                },
+                title = data.getString("title") ?: "",
+                text = data.getString("text") ?: "",
+                date = data.getString("date") ?: "",
+                time = data.getString("time") ?: "",
+                priority = data.getString("priority") ?: "",
+                read = data.getBoolean("read", false)
             )
         }
     }

@@ -77,4 +77,16 @@ class MainViewModel @Inject constructor(
         }
         _onlyNotRead.value = filter
     }
+
+    fun addMessages(vararg messages: Message) {
+        if (_dataLoading.value) {
+            return
+        }
+
+        _dataLoading.value = true
+        viewModelScope.launch {
+            repository.addMassages(*messages)
+            _dataLoading.value = false
+        }
+    }
 }

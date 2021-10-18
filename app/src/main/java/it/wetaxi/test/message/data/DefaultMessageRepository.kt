@@ -24,7 +24,7 @@ class DefaultMessageRepository @Inject constructor(
             return Result.Error()
         }
 
-        messageDao.addMessage(response.message)
+        messageDao.addMessages(response.message)
 
         return Result.Success(response.message)
     }
@@ -33,8 +33,8 @@ class DefaultMessageRepository @Inject constructor(
         messageDao.markAllMessagesRead()
     }
 
-    override suspend fun addMassage(message: Message) {
-        messageDao.addMessage(message)
+    override suspend fun addMassages(vararg messages: Message) {
+        messageDao.addMessages(*messages)
     }
 
 

@@ -31,7 +31,7 @@ class WeFirebaseMessagingService : FirebaseMessagingService() {
         super.onMessageReceived(remoteMessage)
         coroutineScope.launch {
             val message = Message.from(remoteMessage.data)
-            repository.addMassage(message)
+            repository.addMassages(message)
         }
     }
 

@@ -16,5 +16,5 @@ interface MessageDao {
     suspend fun markAllMessagesRead()
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun addMessage(message: Message)
+    suspend fun addMessages(vararg messages: Message)
 }

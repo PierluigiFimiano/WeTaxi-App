@@ -10,5 +10,5 @@ interface MessageRepository {
 
     suspend fun markAllMessagesRead()
 
-    suspend fun addMassage(message: Message)
+    suspend fun addMassages(vararg messages: Message)
 }
