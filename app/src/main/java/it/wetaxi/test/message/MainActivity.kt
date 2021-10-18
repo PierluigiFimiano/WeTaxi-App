@@ -1,42 +1,67 @@
 package it.wetaxi.test.message
 
 import android.os.Bundle
-import com.google.android.material.snackbar.Snackbar
-import androidx.appcompat.app.AppCompatActivity;
 import android.view.Menu
 import android.view.MenuItem
-import com.google.firebase.iid.FirebaseInstanceId
+import androidx.activity.viewModels
+import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
+import com.google.firebase.messaging.FirebaseMessaging
+import dagger.hilt.android.AndroidEntryPoint
+import it.wetaxi.test.message.databinding.ActivityMainBinding
+import it.wetaxi.test.message.util.observeEvent
+import kotlinx.coroutines.flow.collectLatest
+import timber.log.Timber
 
-import kotlinx.android.synthetic.main.activity_main.*
-import com.google.firebase.iid.InstanceIdResult
-import com.google.android.gms.tasks.OnSuccessListener
-import android.app.Activity
-import android.util.Log
-import com.google.android.gms.tasks.OnCompleteListener
-
-
+@AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
-    val TAG = "MainActivity";
+
+    private lateinit var binding: ActivityMainBinding
+    private val viewModel: MainViewModel by viewModels()
+    private lateinit var adapter: MessageAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
-        setSupportActionBar(toolbar)
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+        setSupportActionBar(binding.toolbar)
 
-        fab.setOnClickListener { view ->
-            Snackbar.make(view, "Chiama API per avere un nuovo messaggio", Snackbar.LENGTH_LONG).show()
+        adapter = MessageAdapter()
+        binding.content.recyclerView.adapter = adapter
+        binding.content.recyclerView.setHasFixedSize(true)
+
+        binding.fab.setOnClickListener {
+            viewModel.getMessage()
         }
 
-        FirebaseInstanceId.getInstance().instanceId
-            .addOnCompleteListener(OnCompleteListener { task ->
+        FirebaseMessaging.getInstance().token
+            .addOnCompleteListener { task ->
                 if (!task.isSuccessful) {
-                    Log.w(TAG, "getInstanceId failed", task.exception)
-                    return@OnCompleteListener
+                    Timber.w("getInstanceId failed", task.exception)
+                    return@addOnCompleteListener
                 }
 
-                val token = task.result?.token
-                Log.d(TAG, token)
-            })
+                val token = task.result ?: return@addOnCompleteListener
+                Timber.d(token)
+            }
+
+        lifecycleScope.launchWhenCreated {
+            viewModel.messages.collectLatest { messages ->
+                adapter.submitList(messages)
+            }
+        }
+
+        viewModel.errorEvent.observeEvent(this) {
+
+        }
+
+        viewModel.successEvent.observeEvent(this) {
+
+        }
+
+        viewModel.dataLoading.observe(this) {
+
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -51,7 +76,7 @@ class MainActivity : AppCompatActivity() {
         // as you specify a parent activity in AndroidManifest.xml.
         return when (item.itemId) {
             R.id.action_settings -> {
-                Snackbar.make(root_layout, "Segna tutti messaggi come letti e li riordina", Snackbar.LENGTH_LONG).show()
+                viewModel.markAllMessagesRead()
                 return true
             }
             else -> super.onOptionsItemSelected(item)

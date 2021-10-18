@@ -1,23 +1,29 @@
 package it.wetaxi.test.message
 
-import android.util.Log
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
+import dagger.hilt.android.AndroidEntryPoint
+import it.wetaxi.test.message.data.MessageRepository
+import timber.log.Timber
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class WeFirebaseMessagingService : FirebaseMessagingService() {
-    val TAG = "WeFirebaseMessaging"
 
-    override fun onMessageReceived(remoteMessage: RemoteMessage?) {
+    @Inject
+    lateinit var repository: MessageRepository
+
+    override fun onMessageReceived(remoteMessage: RemoteMessage) {
         super.onMessageReceived(remoteMessage)
 
-        remoteMessage?.notification?.let { it ->
-            Log.d(TAG, "${it.tag} ${it.title} ${it.body}")
+        remoteMessage.notification?.let { it ->
+            Timber.d("${it.tag} ${it.title} ${it.body}")
         }
     }
 
-    override fun onNewToken(token: String?) {
+    override fun onNewToken(token: String) {
         super.onNewToken(token)
 
-        Log.d(TAG, "Refreshed token: $token")
+        Timber.d("Refreshed token: $token")
     }
 }
