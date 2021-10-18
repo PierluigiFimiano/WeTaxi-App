@@ -1,7 +1,5 @@
 package it.wetaxi.test.message
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -10,6 +8,8 @@ import it.wetaxi.test.message.data.MessageRepository
 import it.wetaxi.test.message.data.Result
 import it.wetaxi.test.message.util.Event
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -18,19 +18,31 @@ class MainViewModel @Inject constructor(
     private val repository: MessageRepository
 ) : ViewModel() {
 
-    private val _dataLoading = MutableLiveData<Boolean>()
-    val dataLoading: LiveData<Boolean> = _dataLoading
+    private val _dataLoading = MutableStateFlow(false)
+    val dataLoading: Flow<Boolean> = _dataLoading
 
-    private val _errorEvent = MutableLiveData<Event<Unit>>()
-    val errorEvent: LiveData<Event<Unit>> = _errorEvent
+    private val _errorEvent = MutableStateFlow<Event<Unit>?>(null)
+    val errorEvent: Flow<Event<Unit>?> = _errorEvent
 
-    private val _successEvent = MutableLiveData<Event<Unit>>()
-    val successEvent: LiveData<Event<Unit>> = _successEvent
+    private val _successEvent = MutableStateFlow<Event<Unit>?>(null)
+    val successEvent: Flow<Event<Unit>?> = _successEvent
 
-    val messages: Flow<List<Message>> = repository.getAllMessages()
+    private val _onlyNotRead = MutableStateFlow(false)
+    val onlyNotRead: Flow<Boolean> = _onlyNotRead
+
+    val messages: Flow<List<Message>> =
+        repository.getAllMessages().combine(_onlyNotRead) { messages, onlyNotRead ->
+            if (onlyNotRead) {
+                messages.filter { message ->
+                    !message.read
+                }
+            } else {
+                messages
+            }
+        }
 
     fun getMessage() {
-        if (_dataLoading.value == true) {
+        if (_dataLoading.value) {
             return
         }
 
@@ -48,7 +60,7 @@ class MainViewModel @Inject constructor(
     }
 
     fun markAllMessagesRead() {
-        if (_dataLoading.value == true) {
+        if (_dataLoading.value) {
             return
         }
 
@@ -57,5 +69,12 @@ class MainViewModel @Inject constructor(
             repository.markAllMessagesRead()
             _dataLoading.value = false
         }
+    }
+
+    fun filterOnlyNotRead(filter: Boolean) {
+        if (_onlyNotRead.value == filter) {
+            return
+        }
+        _onlyNotRead.value = filter
     }
 }

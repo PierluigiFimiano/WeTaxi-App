@@ -2,6 +2,9 @@ package it.wetaxi.test.message.util
 
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.mapNotNull
 
 data class Event<out T : Any>(
     val content: T
@@ -28,4 +31,8 @@ fun <T : Any> LiveData<Event<T>>.observeEvent(owner: LifecycleOwner, onChanged: 
             onChanged(it)
         }
     }
+}
+
+suspend fun <T : Any> Flow<Event<T>?>.collectEvent(action: suspend (value: T) -> Unit) {
+    this.mapNotNull { it?.getContentIfNotHandled() }.collect(action)
 }
