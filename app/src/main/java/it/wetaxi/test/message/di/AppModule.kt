@@ -47,7 +47,7 @@ object AppModule {
     fun provideMessageService(moshi: Moshi): MessageService {
         val retrofit = Retrofit.Builder()
             .addConverterFactory(MoshiConverterFactory.create(moshi))
-            .baseUrl("https://stg.data.wetaxi.org")
+            .baseUrl("http://stg.data.wetaxi.org")
             .build()
 
         return retrofit.create(MessageService::class.java)
