@@ -97,7 +97,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     // This code doesn't work and I didn't find a way to retrieve all the notifications.
-    // A better solution can be forse the execution of the [onMessageReceived] method
+    // A better solution can be force the execution of the [onMessageReceived] method
     // removing the "notification" field or from backend or from mobile side.
     // The real problem is that a notification should not contain important
     // data for the application.
